@@ -60,5 +60,11 @@ this.i18n = {
     },
     "wptResult": {
         "en": "WPT Result",
+    },
+    "resetChecked": {
+        "en": "Reset Checked"
+    },
+    "checked": {
+        "en": "Checked"
     }
 };

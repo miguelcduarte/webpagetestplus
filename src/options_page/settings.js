@@ -31,6 +31,14 @@ window.addEvent("domready", function () {
         text: i18n.get("resetOrder")
     });
 
+    let resetMetricCheckedButton = settings.create({
+        tab: i18n.get("metrics"),
+        group: i18n.get("checked"),
+        name: "resetMetricChecked",
+        type: "button",
+        text: i18n.get("resetChecked")
+    })
+
     // CACHE
     settings.create({
         tab: i18n.get("server"),
@@ -61,5 +69,9 @@ window.addEvent("domready", function () {
 
     resetMetricOrderButton.addEvent('action', function () {
         appSettings.set('metricOrder', undefined);
+    });
+
+    resetMetricCheckedButton.addEvent('action', function() {
+        appSettings.set('metricChecked', undefined);
     });
 });

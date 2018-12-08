@@ -1,4 +1,5 @@
 var ReportMetricConfig = function () {
+    const METRICS_STATE_KEY = 'metricsState';
 
     const appSettings = new AppSettings();
 
@@ -194,7 +195,7 @@ var ReportMetricConfig = function () {
 
     const init = function () {
         metrics.forEach(metric => metric.evaluate = jsonata(metric.expression).evaluate);
-        order();
+        setState();
 
         numberFormatDigits = parseInt(appSettings.get('formatNumberDigits'))
     }
@@ -203,19 +204,21 @@ var ReportMetricConfig = function () {
 
     const list = () => metrics;
 
-    const setOrder = function (metricOrder) {
-        appSettings.set('metricOrder', metricOrder);
-        order(metricOrder);
+    const setMetricsState = function (metricState) {
+        appSettings.set(METRICS_STATE_KEY, metricState);
+        setState(metricState);
     }
 
-    const order = function (metricOrder) {
-        metricOrder = metricOrder || appSettings.get('metricOrder');
-        metricOrder && metrics.sort((m1, m2) => {
-            let mi1 = metricOrder.indexOf(m1.name),
-                mi2 = metricOrder.indexOf(m2.name);
+    const setState = function (metricState) {
+        metricState = metricState || appSettings.get(METRICS_STATE_KEY);
+        metricState && metrics.sort((m1, m2) => {
+            let mi1 = metricState.findIndex(e => e.name === m1.name),
+                mi2 = metricState.findIndex(e => e.name === m2.name);
 
             return mi1 - mi2;
         });
+
+        metricState && metrics.forEach((metric, index) => metric.checked = metricState[index].selected);
     }
 
     init();
@@ -223,6 +226,6 @@ var ReportMetricConfig = function () {
     return {
         get,
         list,
-        setOrder,
+        setMetricsState,
     }
 }

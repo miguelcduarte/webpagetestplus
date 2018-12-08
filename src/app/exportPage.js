@@ -1,7 +1,7 @@
 var ExportPage = (function () {
 
     const settings = new AppSettings();
-    const metricCongig = new ReportMetricConfig();
+    const metricConfig = new ReportMetricConfig();
     const cache = settings.get('useReportCache') ? new MemoryCache() : undefined;
 
     const init = function (endpoint, testCode) {
@@ -54,18 +54,28 @@ var ExportPage = (function () {
         });
     }
 
-    const onMetricMoved = function () {
+    const onMetricMoved = () => {
+        setMetricsState();
+    }
+
+    const onMetricChange = () => {
+        setMetricsState();
+    }
+
+    const setMetricsState = () => {
         var metrics = getExportMetrics(i => true);
 
-        metricCongig.setOrder(metrics);
+        metricConfig.setMetricsState(metrics);
     }
 
     const getExportMetrics = function (filterCallback) {
         let metricInputs = FormHelper.getInputs('metrics');
-
+        
         filterCallback = filterCallback || (i => i.checked);
-
-        return Array.from(metricInputs).filter(filterCallback).map((i) => i.value);
+        
+        return Array.from(metricInputs).filter(filterCallback).map((i) => { 
+            return { name: i.value, selected: i.checked }
+        });
     }
 
     const getFilters = function () {
@@ -117,7 +127,7 @@ var ExportPage = (function () {
     const renderMetricsSelector = function () {
         let metricSelector = document.getElementById('metricSelector');
 
-        metricCongig.list()
+        metricConfig.list()
             .filter(metric => metric.visible)
             .forEach(metric => HtmlHelper.insertBeforeEnd(metricSelector, Template.render('metricCheckbox', metric)));
     }
@@ -128,6 +138,7 @@ var ExportPage = (function () {
         document.getElementById('aggregate').addEventListener('change', onAggregationChange);
 
         UIkit.util.on('#metricSelector', 'moved', onMetricMoved);
+        UIkit.util.on('#metricSelector', 'change', onMetricChange);
     }
 
     return {
